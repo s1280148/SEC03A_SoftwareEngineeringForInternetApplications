@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block page_title %}{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'dist/bootstrap/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'dist/fontawesome/css/all.min.css' %}">
+  <link rel="stylesheet" href="{% static 'dist/bootstrap-datepicker/css/bootstrap-datepicker.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/header.css' %}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  {% include 'components/header.html' %}
+  <div class="wrapper h-100 w-100">
+  <div class="container blog-app-container">
+    <div class="my-4"></div>
+    {% include 'components/messages.html' %}
+    <div class="border-bottom mb-4">
+      <h1 class="display-5">{% block title %}{% endblock %}</h1>
+    </div>
+    {% block contents %}{% endblock %}
+  </div>
+  </div>
+  <script src="{% static 'dist/jquery/jquery-3.7.0.min.js' %}"></script>
+  <script src="{% static 'dist/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'dist/bootstrap-datepicker/js/bootstrap-datepicker.min.js' %}"></script>
+  {% block script %}{% endblock %}
+</body>
+</html>

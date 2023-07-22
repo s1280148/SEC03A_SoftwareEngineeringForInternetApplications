@@ -1,0 +1,12 @@
+.bg-light-blue {
+  background-color: #e3f2fd;
+}
+
+.post-create-btn {
+  width: 2.4rem !important;
+  height: 2.4rem !important;
+}
+
+.post-create-btn > span {
+  font-size: 21px;
+}

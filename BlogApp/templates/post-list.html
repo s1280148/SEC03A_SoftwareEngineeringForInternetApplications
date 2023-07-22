@@ -1,0 +1,25 @@
+{% extends 'components/base.html' %}
+{% load static %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/post.css' %}">
+{% endblock %}
+
+{% block page_title %}Posts{% endblock %}
+{% block title %}Posts{% endblock %}
+
+{% block contents %}
+  <div class="list-group">
+    {% for post in post_list %}
+      {% include 'components/post.html' %}
+    {% endfor %}
+  </div>
+  {% include 'components/pagination.html' %}
+  {% if request.user.is_authenticated %}
+    {% include 'components/modal-post-delete.html' %}
+  {% endif %}
+{% endblock %}
+
+{% block script %}
+  <script src="{% static 'js/post.js' %}"></script>
+{% endblock %}

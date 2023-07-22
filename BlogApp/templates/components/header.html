@@ -1,0 +1,36 @@
+{% load static %}
+
+<nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light-blue border border-3 border-top-0 border-start-0 border-end-0">
+  <div class="container-fluid">
+    <a class="navbar-brand mx-4" href="#">Blog</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav me-auto">
+        <a class="nav-link{% if request.resolver_match.url_name == 'post-list' %} active{% endif %}" href="{% url 'post-list' %}">Posts</a>
+        <a class="nav-link{% if request.resolver_match.url_name == 'user-list' %} active{% endif %}" href="{% url 'user-list' %}">Authors</a>
+        <a class="nav-link{% if request.resolver_match.url_name == 'post-search' %} active{% endif %}" href="{% url 'post-search' %}">Search</a>
+        {% if request.user.is_authenticated %}
+          <a class="nav-link {% if request.resolver_match.url_name == 'post-my-list' %} active{% endif %}" href="{% url 'post-my-list' %}">My Posts</a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'post-bookmark-list' %} active{% endif %}" href="{% url 'post-bookmark-list' %}">Bookmarks</a>
+        {% endif %}
+      </div>
+      <div class="navbar-nav">
+        {% if request.user.is_authenticated %}
+          <a role="button" class="btn btn-outline-success rounded-circle p-0 post-create-btn border-2 me-3" href="{% url 'post-create' %}">
+            <span class="align-middle">+</span>
+          </a>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</button>
+        {% else %}
+          <a class="btn btn-primary me-2" role="button" href="{% url 'signup' %}">Signup</a>
+          <a class="btn btn-primary" role="button" href="{% url 'login' %}">Login</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>
+
+{% if request.user.is_authenticated %}
+  {% include 'components/modal-logout.html' %}
+{% endif %}
