@@ -1,0 +1,18 @@
+{% extends 'components/base.html' %}
+{% load static %}
+
+{% block page_title %}Authors{% endblock %}
+{% block title %}Authors{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/user.css' %}">
+{% endblock %}
+
+{% block contents %}
+  <ul class="list-group">
+    {% for user in user_list %}
+      {% include 'components/user.html' with user=user %}
+    {% endfor %}
+  </ul>
+  {% include 'components/pagination.html' %}
+{% endblock %}

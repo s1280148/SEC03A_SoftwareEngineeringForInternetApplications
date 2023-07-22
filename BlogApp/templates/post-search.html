@@ -1,0 +1,76 @@
+{% extends 'components/base.html' %}
+{% load static %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/post.css' %}">
+{% endblock %}
+
+{% block page_title %}Search{% endblock %}
+{% block title %}Search{% endblock %}
+
+{% block contents %}
+  <form method="get" action="{% url 'post-search' %}">
+    {% csrf_token %}
+    <div class="card mb-5">
+      <div class="card-body">
+        <div class="row align-items-center mb-3">
+          <div class="col-2">
+            <label class="col-form-label">Title</label>
+          </div>
+          <div class="col-6">
+            {{ post_search_form.title }}
+          </div>
+        </div>
+        <div class="row align-items-center mb-3">
+          <div class="col-2">
+            <label class="col-form-label">Content</label>
+          </div>
+          <div class="col-6">
+            {{ post_search_form.content }}
+          </div>
+        </div>
+        <div class="row align-items-center mb-3">
+          <div class="col-2">
+            <label class="col-form-label">Author</label>
+          </div>
+          <div class="col-6">
+            {{ post_search_form.author_id }}
+          </div>
+        </div>
+        <div class="row align-items-center mb-4">
+          <div class="col-2">
+            <label class="col-form-label">Creation Date</label>
+          </div>
+          <div class="col-6">
+            <div class="input-group date" id="datepicker">
+              {{ post_search_form.creation_date }}
+              <span class="input-group-append">
+                <span class="input-group-text bg-light d-block">
+                  <i class="fa-solid fa-calendar-days"></i>
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+      </div>
+    </div>
+    <input type="hidden" name="search" value="true">
+  </form>
+  <div class="list-group">
+    {% for post in post_list %}
+      {% include 'components/post.html' %}
+    {% endfor %}
+  </div>
+  {% include 'components/pagination.html' with additional_query=additional_query %}
+  {% if request.user.is_authenticated %}
+    {% include 'components/modal-post-delete.html' %}
+  {% endif %}
+{% endblock %}
+
+{% block script %}
+  <script src="{% static 'js/post_search.js' %}"></script>
+  <script src="{% static 'js/post.js' %}"></script>
+{% endblock %}
