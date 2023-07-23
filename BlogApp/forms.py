@@ -17,12 +17,14 @@ class SignUpForm(UserCreationForm):
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
 
+
 class LoginForm(AuthenticationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
+
 
 class PostCreateForm(ModelForm):
 
@@ -34,6 +36,7 @@ class PostCreateForm(ModelForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
+
 
 class PostUpdateForm(ModelForm):
 

@@ -1,0 +1,46 @@
+{% extends 'components/base.html' %}
+{% load static %}
+{% load turbo_streams %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/post.css' %}">
+  {% include "turbo/head.html" %}
+  {% turbo_subscribe 'BlogApp:CommentStream' %}
+{% endblock %}
+
+{% block page_title %}Detail{% endblock %}
+{% block title %}Detail{% endblock %}
+
+{% block contents %}
+  <div class="list-group">
+    {% include 'components/detail-post.html' %}
+  </div>
+  <hr>
+  <div class="comment-area" data-post-id="{{ post.id }}">
+    <div class="my-4">
+      <h1 class="display-7">Comments</h1>
+    </div>
+    <div id="post{{ post.id }}CommentList">
+      {% for comment in comment_list %}
+        {% include 'components/comment.html' with comment=comment %}
+      {% endfor %}
+    </div>
+    {% if request.user.is_authenticated %}
+      <div class="comment-create-area my-5">
+        {% csrf_token %}
+        <textarea class="form-control mb-3 comment-content-textarea" placeholder="Add Comment" rows="3"></textarea>
+        <div class="text-center">
+          <button type="button" class="btn btn-primary comment-create-btn">Comment</button>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+  {% if request.user.is_authenticated %}
+    {% include 'components/modal-post-delete.html' %}
+  {% endif %}
+{% endblock %}
+
+{% block script %}
+  <script src="{% static 'js/post.js' %}"></script>
+  <script src="{% static 'js/post-detail.js' %}"></script>
+{% endblock %}

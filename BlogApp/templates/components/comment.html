@@ -1,0 +1,10 @@
+<div class="card mb-2 shadow-sm bg-body rounded">
+  <div class="card-body">
+    <div>
+      <p class="text-break">{{ comment.content }}</p>
+    </div>
+    <div>
+      <small class="text-muted">{{ comment.user.username }} | {{ comment.creation_date|date:"Y/n/j H:i" }}</small>
+    </div>
+  </div>
+</div>

@@ -5,7 +5,7 @@
 {% block title %}Login{% endblock %}
 
 {% block contents %}
-  <form method="post" action="{% url 'login' %}">
+  <form method="post" class="w-50 m-auto" action="{% url 'login' %}">
   {% csrf_token %}
     <div class="mb-4">
       <div class="mb-3">

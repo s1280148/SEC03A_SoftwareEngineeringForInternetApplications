@@ -1,0 +1,33 @@
+{% load static %}
+
+<div class="card mb-3 post-area" data-post-id="{{ post.id }}">
+  <div class="card">
+    <div class="card-header d-flex">
+      <div class="me-auto">
+        <h3 class="my-1">{{ post.title }}</h3>
+      </div>
+      {% if request.user.is_authenticated %}
+        <div class="d-flex align-items-center">
+          <i class="fa-regular fa-star fa-xl bookmark-create-btn{% if post.id in bookmark_post_id_list %} d-none{% endif %}"></i>
+          <i class="fa-solid fa-star fa-xl bookmark-delete-btn{% if post.id not in bookmark_post_id_list %} d-none{% endif %}"></i>
+        </div>
+      {% endif %}
+    </div>
+    <div class="card-body d-flex">
+      <p class="mb-0 text-break">{{ post.content }}</p>
+    </div>
+    <div class="card-footer d-flex">
+      <div class="me-auto">
+        <small class="text-muted">{{ post.author.username }} | {{ post.creation_date|date:"Y/n/j H:i" }}</small>
+      </div>
+      {% if request.user.is_authenticated and post.author == request.user %}
+        <div class="d-flex align-items-center">
+          <a class="me-4" href="{% url 'post-update' post.pk %}">
+            <i class="fa-solid fa-pencil fa-xl post-edit-btn"></i>
+          </a>
+          <i class="fa-solid fa-trash-can fa-xl text-danger post-delete-btn" data-bs-toggle="modal" data-bs-target="#postDeleteModal"></i>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>

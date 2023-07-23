@@ -5,7 +5,7 @@
 {% block title %}Create{% endblock %}
 
 {% block contents %}
-  <form method="post" action="{% url 'post-create' %}">
+  <form method="post" class="w-75 m-auto" action="{% url 'post-create' %}">
   {% csrf_token %}
     <div class="mb-4">
       <div class="mb-3">

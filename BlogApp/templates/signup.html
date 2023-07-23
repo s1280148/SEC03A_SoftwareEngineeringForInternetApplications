@@ -5,7 +5,7 @@
 {% block title %}Signup{% endblock %}
 
 {% block contents %}
-  <form method="post" action="{% url 'signup' %}">
+  <form method="post" class="w-50 m-auto" action="{% url 'signup' %}">
   {% csrf_token %}
     <div class="mb-4">
       <div class="mb-3">

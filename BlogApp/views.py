@@ -1,20 +1,23 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LogoutView, LoginView
 from django.http import JsonResponse
-from django.views.generic import ListView, CreateView, DeleteView, UpdateView
-from django.contrib.auth import authenticate, login
+from django.views.generic import ListView, CreateView, DeleteView, UpdateView, DetailView
+from django.contrib.auth import login
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
 from .forms import SignUpForm, LoginForm, PostCreateForm, PostSearchForm, PostUpdateForm
-from .models import Post, User, Bookmark
+from .models import Post, User, Bookmark, Comment
 
+import json
+import datetime
 
+num_per_page = 5
 class PostListView(ListView):
     template_name = "post-list.html"
     model = Post
-    paginate_by = 5
+    paginate_by = num_per_page
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -30,10 +33,11 @@ class PostListView(ListView):
         post_list = Post.objects.order_by('-creation_date')
         return post_list
 
+
 class PostMyListView(LoginRequiredMixin, ListView):
     template_name = "post-my-list.html"
     model = Post
-    paginate_by = 5
+    paginate_by = num_per_page
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -52,7 +56,7 @@ class PostMyListView(LoginRequiredMixin, ListView):
 class PostBookmarkListView(LoginRequiredMixin, ListView):
     template_name = "post-bookmark-list.html"
     model = Post
-    paginate_by = 5
+    paginate_by = num_per_page
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -65,8 +69,27 @@ class PostBookmarkListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         user = self.request.user
-        post_list = Post.objects.filter(bookmarks__user=user)
+        post_list = Post.objects.filter(bookmarks__user=user).order_by('-creation_date')
         return post_list
+
+
+class PostDetailView(DetailView):
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user = self.request.user
+        if self.request.user.is_authenticated:
+            bookmark_id_list = Bookmark.objects.filter(user=user).values_list('post_id', flat=True)
+            context['bookmark_post_id_list'] = bookmark_id_list
+
+        comment_list = Comment.objects.all().filter(post_id=self.kwargs['pk']).order_by('creation_date')
+        context['comment_list'] = comment_list
+
+        return context
+
+    template_name = 'post-detail.html'
+    model = Post
 
 
 class PostCreateView(LoginRequiredMixin, CreateView):
@@ -83,6 +106,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         messages.success(self.request, 'Create post')
         return super().form_valid(form)
 
+
 class PostUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'post-update.html'
     model = Post
@@ -93,6 +117,7 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
         post = form.save(commit=False)
         messages.success(self.request, 'Update post')
         return super().form_valid(form)
+
 
 class PostDeleteView(LoginRequiredMixin, DeleteView):
     model = Post
@@ -105,8 +130,9 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
         messages.success(self.request, 'Successfully deleted')
         return super(PostDeleteView, self).delete(request, *args, **kwargs)
 
+
 class PostSearchView(ListView):
-    paginate_by = 5
+    paginate_by = num_per_page
     template_name = 'post-search.html'
     model = Post
 
@@ -157,16 +183,21 @@ class PostSearchView(ListView):
             if author_id:
                 post_list = post_list.filter(author__pk=author_id)
             if creation_date:
-                post_list = post_list.filter(creation_date=creation_date)
+                target_datetime = datetime.datetime.strptime(creation_date + ' 00:00:00', '%Y/%m/%d %H:%M:%S')
+                target_year = target_datetime.strftime('%Y')
+                target_month = target_datetime.strftime('%m')
+                target_day = target_datetime.strftime('%d')
+                post_list = post_list.filter(creation_date__year=target_year, creation_date__month=target_month, creation_date__day=target_day)
             return post_list.order_by('-creation_date')
 
         else:
             return Post.objects.none()
 
+
 class UserListView(ListView):
     template_name = "user-list.html"
     model = User
-    paginate_by = 5
+    paginate_by = num_per_page
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -186,6 +217,7 @@ class UserListView(ListView):
         user_list = User.objects.all().filter(is_superuser=False).order_by('username')
         return user_list
 
+
 class SignUpView(CreateView):
     template_name = "signup.html"
     form_class = SignUpForm
@@ -200,14 +232,15 @@ class SignUpView(CreateView):
 
         return response
 
+
 class BlogLoginView(LoginView):
     template_name = "login.html"
     form_class = LoginForm
 
     def form_valid(self, form):
-        user = form.get_user()
         messages.success(self.request, "Successfully log in")
         return super().form_valid(form)
+
 
 class BlogLogoutView(LoginRequiredMixin, LogoutView):
     template_name = "post-list.html"
@@ -234,5 +267,27 @@ def delete_bookmark(request, post_id):
     post = Post.objects.get(id=post_id)
 
     Bookmark.objects.filter(user=user, post=post).delete()
+
+    return JsonResponse({'status': 'success'})
+
+
+@login_required
+def create_comment(request, post_id):
+    user = request.user
+
+    post = None
+
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        return JsonResponse({'status': 'post does not exist'})
+
+    data = json.loads(request.body)
+    content = data["content"]
+
+    if content == "":
+        return JsonResponse({'status': 'content is empty'})
+
+    Comment.objects.create(user=user, post=post, content=content)
 
     return JsonResponse({'status': 'success'})
