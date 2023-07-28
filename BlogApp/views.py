@@ -14,6 +14,8 @@ import json
 import datetime
 
 num_per_page = 5
+
+
 class PostListView(ListView):
     template_name = "post-list.html"
     model = Post
